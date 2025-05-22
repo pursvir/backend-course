@@ -34,7 +34,7 @@ def create_hotel(
     })
     return {"status": "OK"}
 
-# НАЧАЛО МОЕГО КОДА
+# BEGIN
 @app.put("/hotels/{hotel_id}")
 def put_hotel(
     hotel_id: int,
@@ -64,7 +64,7 @@ def patch_hotel(
                 hotel["name"] = name
             return {"status": "OK"}
     return {"status": "NOT OK"}
-# КОНЕЦ МОЕГО КОДА
+# END
 
 @app.delete("/hotels/{hotel_id}")
 def delete_hotel(hotel_id: int):
