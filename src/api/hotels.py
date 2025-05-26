@@ -1,5 +1,6 @@
-from fastapi import Query, Path, Body, APIRouter
-from schemas.hotels import Hotel, HotelPatch
+from fastapi import Query, Path, Body, APIRouter, Depends
+from src.api.dependencies import PaginationDep
+from src.schemas.hotels import Hotel, HotelPatch
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -22,27 +23,21 @@ PER_PAGE_DEFAULT = 4
     Также поддерживается пагинация, где page - порядковый номер страницы, а per_page - сколько вы хотите получить отелей в ответе</h3>"
 )
 def get_hotels(
+    pagination: PaginationDep,
     # or Optional[type] (typing.Optional) on older Python
     id: int | None = Query(None, description="Hotel ID in the database"),
     title: str | None = Query(None, description="Hotel name"),
-    page: int | None = Query(None, description="Page sequence number"),
-    per_page: int | None = Query(None, description="Hotels per page count"),
 ):
-    if (page and page < 1) or (per_page and per_page < 1):
-        # Тут по идее нужно отсылать клиенту что-то из диапазона 400, но мы пока не дошли до этого :)
-        return []
-    if not page:
-        page = 1
-    if not per_page:
-        per_page = PER_PAGE_DEFAULT
-    begin_index = (page - 1) * per_page
     hotels_ = []
-    for hotel in hotels[begin_index:(begin_index + per_page)]:
+    for hotel in hotels:
         if id and hotel["id"] != id:
             continue
         if title and hotel["title"] != title:
            continue
         hotels_.append(hotel)
+    if pagination.page and pagination.per_page:
+        begin_index = (pagination.page - 1) * pagination.per_page
+        hotels_ = hotels[begin_index:(begin_index + pagination.per_page)]
     return hotels_
 
 @router.post(
