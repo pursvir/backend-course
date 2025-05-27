@@ -25,6 +25,3 @@ class HotelsRepository(BaseRepository):
         print(query.compile(compile_kwargs={"literal_binds": True}))
         result = await self._session.execute(query)
         return result.scalars().all()
-
-    # async def get_one_or_none(self, **filter_by):
-    #     ...

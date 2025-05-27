@@ -1,15 +1,10 @@
-from re import L
 from fastapi import Query, Path, Body, APIRouter, Depends
-from fastapi.exceptions import HTTPException
 from src.repos.hotels import HotelsRepository
 from src.api.dependencies import PaginationDep
 from src.db import async_session_maker
 from src.schemas.hotels import Hotel, HotelPatch
 
-
 router = APIRouter(prefix="/hotels", tags=["Отели"])
-
-PER_PAGE_DEFAULT = 4
 
 @router.get(
     "",
@@ -30,6 +25,15 @@ async def get_hotels(
             limit=per_page,
             offset=per_page * (pagination.page - 1),
         )
+
+@router.get(
+    "/{hotel_id}",
+    summary="Получить отель",
+    description="<h3>Тут мы можем получить отель по ID-шнику из базы.</h3>"
+)
+async def get_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        return await HotelsRepository(session).get_one_or_none(id=hotel_id)
 
 @router.post(
     "",
@@ -74,15 +78,10 @@ async def patch_hotel(
     hotel_id: int,
     hotel_data: HotelPatch
 ):
-    global hotels
-    for hotel in hotels:
-        if hotel["id"] == hotel_id:
-            if hotel_data.title:
-                hotel["title"] = hotel_data.title
-            if hotel_data.name:
-                hotel["name"] = hotel_data.name
-            return {"status": "OK"}
-    return {"status": "NOT OK"}
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data, partially_updated=True, id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}
 
 @router.delete(
     "/{hotel_id}",

@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from sqlalchemy import select, insert, update, delete
-from src.models.hotels import HotelsORM
 
 class BaseRepository:
     model = None
@@ -25,13 +24,13 @@ class BaseRepository:
             .returning(self.model)
         )
         result = await self._session.execute(add_stmt)
-        return result.scalars.one()
+        return result.scalars().one()
 
-    async def edit(self, data: BaseModel, **filter_by) -> None:
+    async def edit(self, data: BaseModel, partially_updated: bool = False, **filter_by) -> None:
         update_stmt = (
             update(self.model)
             .filter_by(**filter_by)
-            .values(**data.model_dump())
+            .values(**data.model_dump(exclude_unset=partially_updated))
         )
         await self._session.execute(update_stmt)
 
