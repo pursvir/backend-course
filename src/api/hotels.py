@@ -2,7 +2,7 @@ from fastapi import Query, Path, Body, APIRouter, Depends
 from src.repos.hotels import HotelsRepository
 from src.api.dependencies import PaginationDep
 from src.db import async_session_maker
-from src.schemas.hotels import Hotel, HotelPatch
+from src.schemas.hotels import Hotel, HotelAdd, HotelPatch
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -40,7 +40,7 @@ async def get_hotel(hotel_id: int):
     summary="Добавление отеля",
     description="<h3>Тут мы добавляем новый отель: нужно отправить name и title</h3>"
 )
-async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
+async def create_hotel(hotel_data: HotelAdd = Body(openapi_examples={
     "1": {"summary": "Сочи", "value": {
         "title": "Отель Сочи 5 звёзд у моря",
         "location": "ул. Моря, 2",
