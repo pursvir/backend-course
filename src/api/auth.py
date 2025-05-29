@@ -1,7 +1,9 @@
-from fastapi import APIRouter, HTTPException, Response, Request
+from os import access
+from fastapi import APIRouter, HTTPException, Response
 from services.auth import AuthService
 from sqlalchemy.exc import IntegrityError
 
+from src.api.dependencies import UserIDDep
 from src.db import async_session_maker
 from src.schemas.users import UserAdd, UserRequestAdd
 from src.repos.users import UsersRepository
@@ -40,9 +42,13 @@ async def login_user(data: UserRequestAdd, response: Response):
         response.set_cookie("access_token", access_token)
     return {"access_token": access_token}
 
-@router.get("/only_auth")
-async def only_auth(request: Request):
-    access_token = request.cookies.get("access_token")
-    return {"token_exists": False if access_token is None else True}
+@router.get("/me")
+async def get_me(user_id: UserIDDep):
+    async with async_session_maker() as session:
+        user = await UsersRepository(session).get_one_or_none(id=user_id)
+        return user
 
-# @router.post("/logout")
+@router.post("/logout")
+async def logout_user(response: Response):
+    response.delete_cookie("access_token")
+    return {"status": "OK"}
