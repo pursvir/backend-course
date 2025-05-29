@@ -1,7 +1,8 @@
+from sqlalchemy import select, insert, delete, func
+
 from src.repos.base import BaseRepository
 from src.schemas.hotels import Hotel
 from src.models.hotels import HotelsORM
-from sqlalchemy import select, insert, delete, func
 
 class HotelsRepository(BaseRepository):
     model = HotelsORM

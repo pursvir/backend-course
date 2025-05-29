@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from src.schemas.hotels import Hotel
 from sqlalchemy import select, insert, update, delete
+
+from src.schemas.hotels import Hotel
 
 class BaseRepository:
     model = None

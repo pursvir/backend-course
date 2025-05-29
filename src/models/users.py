@@ -1,6 +1,6 @@
-from enum import unique
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
+
 from src.db import Base
 
 class UsersORM(Base):
