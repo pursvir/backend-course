@@ -1,8 +1,12 @@
 from fastapi import Depends, Query, Request, HTTPException
 from pydantic import BaseModel
-from typing import Annotated
+from typing import Annotated, List
 
+from sqlalchemy.ext.asyncio.session import async_session
+
+from src.db import async_session_maker
 from src.services.auth import AuthService
+from src.utils.db_manager import DBManager
 
 class PaginationParams(BaseModel):
     page: Annotated[int | None, Query(1, ge=1)]
@@ -23,3 +27,10 @@ def get_current_user_id(token: str = Depends(get_token)) -> int:
     return user_id
 
 UserIDDep = Annotated[int, Depends(get_current_user_id)]
+
+
+async def get_db():
+    async with DBManager(session_factory=async_session_maker) as db:
+       yield db
+
+DBDep = Annotated[DBManager, Depends(get_db)]

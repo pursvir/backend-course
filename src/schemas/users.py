@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 
-class UserRequestAdd(BaseModel):
+class UserAddRequest(BaseModel):
     email: EmailStr
     password: str
 
