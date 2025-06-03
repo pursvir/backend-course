@@ -6,8 +6,9 @@ from src.models.hotels import HotelsORM
 
 class HotelsRepository(BaseRepository):
     model = HotelsORM
+    schema = Hotel
 
-    async def get_all(
+    async def get_filtered(
         self,
         location,
         title,

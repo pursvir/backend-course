@@ -21,7 +21,7 @@ async def get_hotels(
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        return await HotelsRepository(session).get_all(
+        return await HotelsRepository(session).get_filtered(
             location,
             title,
             limit=per_page,
@@ -64,7 +64,7 @@ async def create_hotel(hotel_data: HotelAdd = Body(openapi_examples={
 )
 async def put_hotel(
     hotel_id: int,
-    hotel_data: Hotel,
+    hotel_data: HotelAdd,
 ):
     async with async_session_maker() as session:
         await HotelsRepository(session).edit(hotel_data, id=hotel_id)

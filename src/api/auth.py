@@ -1,4 +1,3 @@
-from os import access
 from fastapi import APIRouter, HTTPException, Response
 from services.auth import AuthService
 from sqlalchemy.exc import IntegrityError
@@ -9,8 +8,8 @@ from src.schemas.users import UserAdd, UserRequestAdd
 from src.repos.users import UsersRepository
 from src.services.auth import AuthService
 
-router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
+router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
 @router.post("/register")
 async def register_user(data: UserRequestAdd):
