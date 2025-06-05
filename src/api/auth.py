@@ -3,9 +3,7 @@ from services.auth import AuthService
 from sqlalchemy.exc import IntegrityError
 
 from src.api.dependencies import DBDep, UserIDDep
-from src.db import async_session_maker
 from src.schemas.users import UserAdd, UserAddRequest
-from src.repos.users import UsersRepository
 from src.services.auth import AuthService
 
 

@@ -2,9 +2,10 @@ from typing import List
 from fastapi import APIRouter
 
 from src.api.dependencies import DBDep
-from src.db import async_session_maker
-from src.repos.rooms import RoomsRepository
-from src.schemas.rooms import RoomRequestAdd, RoomAdd, RoomPatchRequest, RoomPatch
+from src.schemas.rooms import (
+    RoomRequestAdd, RoomAdd,
+    RoomPatchRequest, RoomPatch
+)
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
 

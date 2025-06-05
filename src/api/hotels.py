@@ -1,9 +1,6 @@
 from fastapi import Query, Path, Body, APIRouter, Depends
-from pydantic.types import DirectoryPath
 
-from src.db import async_session_maker
 from src.schemas.hotels import Hotel, HotelAdd, HotelPatch
-from src.repos.hotels import HotelsRepository
 from src.api.dependencies import DBDep, PaginationDep
 
 

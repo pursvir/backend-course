@@ -24,6 +24,12 @@ class BaseRepository:
             return None
         return self.schema.model_validate(row)
 
+    async def get_one(self, **filter_by):
+        query = select(self.model).filter_by(**filter_by)
+        result = await self._session.execute(query)
+        row = result.scalars().one()
+        return self.schema.model_validate(row)
+
     async def add(self, data: BaseModel):
         add_stmt = (
             insert(self.model)
