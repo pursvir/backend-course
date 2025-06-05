@@ -12,8 +12,16 @@ async def add_booking(db: DBDep, user_id: UserIDDep, booking_data: BookingAddReq
     booking_data_ = BookingAdd(
         user_id=user_id,
         price=price,
-        **booking_data.dict()
+        **booking_data.model_dump()
     )
     new_booking_data = await db.bookings.add(booking_data_)
     await db.commit()
     return {"status": "OK", "data": new_booking_data}
+
+@router.get("")
+async def get_bookings(db: DBDep):
+    return await db.bookings.get_all()
+
+@router.get("/me")
+async def get_bookings_me(db: DBDep, user_id: UserIDDep):
+    return await db.bookings.get_filtered(user_id=user_id)
