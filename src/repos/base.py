@@ -46,8 +46,6 @@ class BaseRepository:
         return self.schema.model_validate(row)
 
     async def add_bulk(self, data: list[BaseModel]) -> None:
-        if not data:
-            return
         add_data_stmt = (
             insert(self.model)
             .values([item.model_dump() for item in data])
