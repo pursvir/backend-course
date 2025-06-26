@@ -18,8 +18,8 @@ async def get_hotels(
     db: DBDep,
     title: str | None = Query(None, description="Hotel name"),
     location: str | None = Query(None, description="Hotel location"),
-    date_from: date = Query(example="2025-06-01"),
-    date_to: date = Query(example="2025-06-12"),
+    date_from: date = Query(examples=["2025-06-01"]),
+    date_to: date = Query(examples=["2025-06-12"]),
 ):
     per_page = pagination.per_page or 5
     return await db.hotels.get_filtered_by_time(

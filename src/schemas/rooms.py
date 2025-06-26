@@ -19,7 +19,7 @@ class Room(RoomAdd):
 
     model_config = ConfigDict(from_attributes=True)
 
-class RoomsWithRels(Room):
+class RoomWithRels(Room):
     facilities: list[Facility]
 
 class RoomPatchRequest(BaseModel):

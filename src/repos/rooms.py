@@ -6,13 +6,13 @@ from src.db import engine
 from src.models.bookings import BookingsORM
 from src.models.rooms import RoomsORM
 from src.repos.base import BaseRepository
+from src.repos.mappers.mappers import RoomsWithRelsDataMapper
 from src.repos.utils import room_ids_for_booking
-from src.schemas.rooms import Room, RoomsWithRels
 
 
 class RoomsRepository(BaseRepository):
     model = RoomsORM
-    schema = Room
+    mapper = RoomsWithRelsDataMapper
 
     async def get_one_or_none(self, **filter_by):
         query = (
@@ -20,7 +20,7 @@ class RoomsRepository(BaseRepository):
             .options(selectinload(self.model.facilities))
             .filter_by(**filter_by)
         )
-        result = await self._session.execute(query)
+        result = await self.session.execute(query)
         row = result.scalars().one_or_none()
         if not row:
             return None
@@ -39,5 +39,5 @@ class RoomsRepository(BaseRepository):
             .options(selectinload(self.model.facilities))
             .filter(RoomsORM.id.in_(room_ids))
         )
-        result = await self._session.execute(query)
-        return [RoomsWithRels.model_validate(model) for model in result.scalars().all()]
+        result = await self.session.execute(query)
+        return [ self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
