@@ -6,13 +6,13 @@ from src.db import engine
 from src.models.bookings import BookingsORM
 from src.models.rooms import RoomsORM
 from src.repos.base import BaseRepository
-from src.repos.mappers.mappers import RoomsWithRelsDataMapper
+from src.repos.mappers.mappers import RoomsDataMapper, RoomsWithRelsDataMapper
 from src.repos.utils import room_ids_for_booking
 
 
 class RoomsRepository(BaseRepository):
     model = RoomsORM
-    mapper = RoomsWithRelsDataMapper
+    mapper = RoomsDataMapper
 
     async def get_one_or_none(self, **filter_by):
         query = (
@@ -40,4 +40,6 @@ class RoomsRepository(BaseRepository):
             .filter(RoomsORM.id.in_(room_ids))
         )
         result = await self.session.execute(query)
-        return [ self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
+        return [
+            RoomsWithRelsDataMapper.map_to_domain_entity(model) for model in result.scalars().all()
+        ]
