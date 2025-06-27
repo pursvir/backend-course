@@ -3,6 +3,7 @@ import pytest
 from httpx import AsyncClient, ASGITransport
 
 from src.main import app
+from src.api.dependencies import get_db
 from src.db import Base, engine_np, async_session_maker_np
 from src.config import settings
 from src.models import *
@@ -16,10 +17,16 @@ from src.utils.db_manager import DBManager
 def check_test_mode():
     assert settings.MODE == "TEST"
 
-@pytest.fixture(scope="function")
-async def db():
+async def get_db_np():
     async with DBManager(async_session_maker_np) as db:
         yield db
+
+@pytest.fixture(scope="function")
+async def db():
+    async for db in get_db_np():
+        yield db
+
+app.dependency_overrides[get_db] = get_db_np
 
 @pytest.fixture(scope="session")
 async def ac():
