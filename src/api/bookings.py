@@ -8,7 +8,7 @@ router = APIRouter(prefix="/bookings", tags=["Бронирование"])
 @router.post("")
 async def add_booking(db: DBDep, user_id: UserIDDep, booking_data: BookingAddRequest):
     room = await db.rooms.get_one(id=booking_data.room_id)
-    price: int = room.price
+    price: int = room.price # type: ignore
     booking_data_ = BookingAdd(
         user_id=user_id,
         price=price,

@@ -8,8 +8,8 @@ from src.schemas.hotels import Hotel
 from src.models.hotels import HotelsORM
 
 class HotelsRepository(BaseRepository):
-    model = HotelsORM
-    mapper = HotelDataMapper
+    model = HotelsORM # type: ignore
+    mapper = HotelDataMapper # type: ignore
 
     async def get_filtered_by_time(
         self,

@@ -48,7 +48,8 @@ def room_ids_for_booking(
         .select_from(rooms_left_table)
         .filter(
             rooms_left_table.c.rooms_left > 0,
-            rooms_left_table.c.room_id.in_(room_ids_from_hotel),
+            # TODO: causes SAWarning
+            rooms_left_table.c.room_id.in_(room_ids_from_hotel), # type: ignore
         )
     )
     return query

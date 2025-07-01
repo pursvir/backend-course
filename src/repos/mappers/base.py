@@ -8,8 +8,8 @@ SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
 
 class DataMapper:
-    db_model: type[DBModelType] = None
-    schema: type[SchemaType] = None
+    db_model: type[DBModelType] = None # type: ignore
+    schema: type[SchemaType] = None # type: ignore
 
     def __init__(self) -> None:
         pass

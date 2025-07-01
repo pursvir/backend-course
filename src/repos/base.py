@@ -7,15 +7,15 @@ from src.repos.mappers.base import DataMapper
 
 
 class BaseRepository:
-    model: Base = None
-    mapper: DataMapper = None
+    model: Base = None # type: ignore
+    mapper: DataMapper = None # type: ignore
 
     def __init__(self, session):
         self.session = session
 
     async def get_filtered(self, *filter, **filter_by):
         query = (
-            select(self.model)
+            select(self.model) # type: ignore
             .filter(*filter)
             .filter_by(**filter_by)
         )
@@ -26,7 +26,7 @@ class BaseRepository:
         return await self.get_filtered()
 
     async def get_one_or_none(self, **filter_by):
-        query = select(self.model).filter_by(**filter_by)
+        query = select(self.model).filter_by(**filter_by) # type: ignore
         result = await self.session.execute(query)
         row = result.scalars().one_or_none()
         if not row:
@@ -34,16 +34,16 @@ class BaseRepository:
         return self.mapper.map_to_domain_entity(row)
 
     async def get_one(self, **filter_by):
-        query = select(self.model).filter_by(**filter_by)
+        query = select(self.model).filter_by(**filter_by) # type: ignore
         result = await self.session.execute(query)
         row = result.scalars().one()
         return self.mapper.map_to_domain_entity(row)
 
     async def add(self, data: BaseModel):
-        add_data_stmt = (
-            insert(self.model)
+        add_data_stmt = ( # type: ignore
+            insert(self.model) # type: ignore
             .values(**data.model_dump())
-            .returning(self.model)
+            .returning(self.model) # type: ignore
         )
         result = await self.session.execute(add_data_stmt)
         row = result.scalars().one()
@@ -51,14 +51,14 @@ class BaseRepository:
 
     async def add_bulk(self, data: Sequence[BaseModel]) -> None:
         add_data_stmt = (
-            insert(self.model)
+            insert(self.model) # type: ignore
             .values([item.model_dump() for item in data])
         )
         await self.session.execute(add_data_stmt)
 
     async def edit(self, data: BaseModel, partially_updated: bool = False, **filter_by) -> None:
         update_stmt = (
-            update(self.model)
+            update(self.model) # type: ignore
             .filter_by(**filter_by)
             .values(**data.model_dump(exclude_unset=partially_updated))
         )
@@ -66,7 +66,7 @@ class BaseRepository:
 
     async def delete(self, **filter_by) -> None:
         delete_stmt = (
-            delete(self.model)
+            delete(self.model) # type: ignore
             .filter_by(**filter_by)
         )
         await self.session.execute(delete_stmt)

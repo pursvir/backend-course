@@ -7,8 +7,8 @@ from src.repos.mappers.mappers import BookingDataMapper
 from src.schemas.bookings import Booking, BookingAdd, BookingAddRequest
 
 class BookingsRepository(BaseRepository):
-    model = BookingsORM
-    mapper = BookingDataMapper
+    model = BookingsORM # type: ignore
+    mapper = BookingDataMapper # type: ignore
 
     async def get_bookings_with_today_checkin(self):
         query = (

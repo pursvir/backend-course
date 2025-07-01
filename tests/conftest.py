@@ -1,4 +1,8 @@
 import json
+from unittest import mock
+
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
+
 import pytest
 from httpx import AsyncClient, ASGITransport
 
@@ -33,7 +37,6 @@ async def ac():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
-
 @pytest.fixture(scope="session", autouse=True)
 async def setup_database(check_test_mode):
     async with engine_np.begin() as conn:
@@ -54,12 +57,36 @@ async def fill_database(setup_database):
         await db_.rooms.add_bulk(rooms_data)
         await db_.commit()
 
+auth_credentials = {
+    "email": "gusev@gmail.com",
+    "password": "12345678",
+}
+access_token = ""
+
 @pytest.fixture(scope="session", autouse=True)
-async def register_user(fill_database, ac):
+async def register_user(fill_database, ac: AsyncClient):
     await ac.post(
         "/auth/register",
-        json={
-            "email": "gusev@gmail.com",
-            "password": "12345678",
-        }
+        json=auth_credentials
     )
+
+@pytest.fixture(scope="session", autouse=True)
+async def obtain_token(register_user, ac: AsyncClient):
+    response = await ac.post(
+        "/auth/login",
+        json=auth_credentials
+    )
+    res = response.json()
+    assert res["access_token"]
+    global access_token
+    access_token = res["access_token"]
+
+@pytest.fixture(scope="session", autouse=True)
+async def authenticated_ac(obtain_token, ac: AsyncClient):
+    assert access_token
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        cookies={"access_token": access_token},
+    ) as ac:
+        yield ac

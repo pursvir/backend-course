@@ -36,7 +36,9 @@ async def add_room(db: DBDep, hotel_id: int, room_data: RoomRequestAdd = Body())
     room = await db.rooms.add(room_data_)
 
     room_facilities_data = [
-        RoomFacilityAdd(room_id=room.id, facility_id=facility_id) \
+        RoomFacilityAdd(
+            room_id=room.id, # type: ignore
+            facility_id=facility_id) \
         for facility_id in room_data.facilities_ids
     ]
     await db.rooms_facilities.add_bulk(room_facilities_data)
