@@ -28,7 +28,7 @@ class RoomsRepository(BaseRepository):
 
     async def get_filtered_by_time(
         self,
-        hotel_id,
+        hotel_id: int,
         date_from: date,
         date_to: date
     ):

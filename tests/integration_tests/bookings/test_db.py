@@ -19,14 +19,10 @@ async def test_booking_crud(db):
     )
     added_booking = await db.bookings.add(booking_data)
 
-    booking = (await db.bookings.get_one_or_none(id=added_booking.id))
+    booking = await db.bookings.get_one_or_none(id=added_booking.id)
     assert booking
     assert booking.id == added_booking.id
-    assert booking.user_id == user_id
-    assert booking.room_id == room_id
-    assert booking.date_from == date_from
-    assert booking.date_to == date_to
-    assert booking.price == 100
+    assert booking.model_dump(exclude={"id"}) == booking_data.model_dump()
 
     date_from = date(year=2025, month=5, day=10)
     date_to = date(year=2025, month=6, day=15)
@@ -38,16 +34,12 @@ async def test_booking_crud(db):
         price=150,
     )
     await db.bookings.edit(updated_booking_data, id=added_booking.id)
-    updated_booking = (await db.bookings.get_one_or_none())
+    updated_booking = await db.bookings.get_one_or_none(id=added_booking.id)
     assert updated_booking
-    assert updated_booking.user_id == user_id
-    assert updated_booking.room_id == room_id
-    assert updated_booking.date_from == date_from
-    assert updated_booking.date_to == date_to
-    assert updated_booking.price == 150
+    assert updated_booking.model_dump(exclude={"id"}) == updated_booking_data.model_dump()
 
     await db.bookings.delete(id=added_booking.id)
-    booking = (await db.bookings.get_one_or_none())
+    booking = (await db.bookings.get_one_or_none(id=added_booking.id))
     assert not booking
 
     await db.rollback()

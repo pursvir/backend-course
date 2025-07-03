@@ -61,32 +61,19 @@ auth_credentials = {
     "email": "gusev@gmail.com",
     "password": "12345678",
 }
-access_token = ""
 
 @pytest.fixture(scope="session", autouse=True)
-async def register_user(fill_database, ac: AsyncClient):
+async def register_user(fill_database, ac):
     await ac.post(
         "/auth/register",
         json=auth_credentials
     )
 
-@pytest.fixture(scope="session", autouse=True)
-async def obtain_token(register_user, ac: AsyncClient):
-    response = await ac.post(
+@pytest.fixture(scope="session")
+async def authenticated_ac(register_user, ac):
+    await ac.post(
         "/auth/login",
         json=auth_credentials
     )
-    res = response.json()
-    assert res["access_token"]
-    global access_token
-    access_token = res["access_token"]
-
-@pytest.fixture(scope="session", autouse=True)
-async def authenticated_ac(obtain_token, ac: AsyncClient):
-    assert access_token
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test",
-        cookies={"access_token": access_token},
-    ) as ac:
-        yield ac
+    assert ac.cookies["access_token"]
+    yield ac
