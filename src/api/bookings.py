@@ -16,12 +16,13 @@ async def get_bookings_me(db: DBDep, user_id: UserIDDep):
 @router.post("")
 async def add_booking(db: DBDep, user_id: UserIDDep, booking_data: BookingAddRequest):
     room = await db.rooms.get_one(id=booking_data.room_id)
+    hotel = await db.hotels.get_one_or_none(id=room.hotel_id) # type: ignore
     price: int = room.price # type: ignore
-    booking_data_ = BookingAdd(
+    booking_data_add = BookingAdd(
         user_id=user_id,
         price=price,
         **booking_data.model_dump()
     )
-    new_booking_data = await db.bookings.add_booking(booking_data_)
+    new_booking_data = await db.bookings.add_booking(booking_data_add, hotel_id=hotel.id) # type: ignore
     await db.commit()
     return {"status": "OK", "data": new_booking_data}

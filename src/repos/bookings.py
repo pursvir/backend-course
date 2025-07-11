@@ -26,10 +26,11 @@ class BookingsRepository(BaseRepository):
             self.mapper.map_to_domain_entity(booking) for booking in res.scalars().all()
         ]
 
-    async def add_booking(self, data: BookingAdd):
+    async def add_booking(self, data: BookingAdd, hotel_id: int):
         room_ids = room_ids_for_booking(
             date_from=data.date_from,
             date_to=data.date_to,
+            hotel_id=hotel_id,
         )
         rooms_availabe_query = (
             select(RoomsORM)
