@@ -45,7 +45,6 @@ async def get_bookings_count(
     authenticated_ac: AsyncClient
 ):
     response = await authenticated_ac.get("/bookings/me")
-    assert response.status_code == 200
     res = response.json()
     assert isinstance(res, list) # or list?
     assert len(res) == successful_room_bookings

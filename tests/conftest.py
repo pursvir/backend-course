@@ -57,10 +57,7 @@ async def fill_database(setup_database):
         await db_.rooms.add_bulk(rooms_data)
         await db_.commit()
 
-auth_credentials = {
-    "email": "gusev@gmail.com",
-    "password": "12345678",
-}
+from vars import auth_credentials
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(fill_database, ac):
