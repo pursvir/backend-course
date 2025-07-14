@@ -1,6 +1,7 @@
 from typing import List, Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     MODE: Literal["TEST", "LOCAL", "DEV", "PROD"] = "PROD"
 
@@ -28,4 +29,5 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env")
 
-settings = Settings() # type: ignore
+
+settings = Settings() # pyright: ignore[reportCallIssue]

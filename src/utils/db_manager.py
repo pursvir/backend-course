@@ -7,7 +7,7 @@ from src.repos.users import UsersRepository
 from src.repos.bookings import BookingsRepository
 
 
-class DBManager():
+class DBManager:
     def __init__(self, session_factory: async_sessionmaker):
         self.session_factory = session_factory
 

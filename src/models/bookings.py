@@ -5,6 +5,7 @@ from sqlalchemy.util.langhelpers import hybridproperty
 
 from src.db import Base
 
+
 class BookingsORM(Base):
     __tablename__ = "bookings"
 

@@ -3,6 +3,7 @@ from sqlalchemy import String
 
 from src.db import Base
 
+
 class UsersORM(Base):
     __tablename__ = "users"
 

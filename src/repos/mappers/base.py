@@ -1,21 +1,21 @@
-from typing import TypeVar
+from typing import TypeVar, Type
 from pydantic.main import BaseModel
+from sqlalchemy import Row, RowMapping
 
 from src.db import Base
 
-DBModelType = TypeVar("DBModelType", bound=Base)
+
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
-
 class DataMapper:
-    db_model: type[DBModelType] = None # type: ignore
-    schema: type[SchemaType] = None # type: ignore
+    db_model: Type[Base]
+    schema: Type[SchemaType] # type: ignore
 
     def __init__(self) -> None:
         pass
 
     @classmethod
-    def map_to_domain_entity(cls, data):
+    def map_to_domain_entity(cls, data: Base | dict | Row | RowMapping):
         return cls.schema.model_validate(data, from_attributes=True)
 
     @classmethod

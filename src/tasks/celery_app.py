@@ -6,9 +6,7 @@ celery_instance = Celery(
     "tasks",
     backend=settings.REDIS_URL,
     broker=settings.REDIS_URL,
-    include=[
-        "src.tasks.tasks"
-    ],
+    include=["src.tasks.tasks"],
 )
 
 # celery_instance.conf.beat_schedule = {

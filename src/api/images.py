@@ -5,6 +5,7 @@ from src.tasks.tasks import resize_image
 
 router = APIRouter(prefix="/images", tags=["Изображения отелей"])
 
+
 @router.post("")
 def upload_image(file: UploadFile) -> None:
     image_path = f"static/images/{file.filename}"

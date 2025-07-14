@@ -1,25 +1,27 @@
 import redis.asyncio as redis
 
+
 class RedisManager:
+    _redis: redis.Redis
+
     def __init__(self, url: str):
         self.url = url
-        self.redis = None
 
     async def connect(self):
-        self.redis = await redis.from_url(self.url)
+        self._redis = await redis.from_url(self.url)
 
     async def close(self):
-        if self.redis:
-            await self.redis.close()
+        if self._redis:
+            await self._redis.close()
 
     async def get(self, key: str):
-        return await self.redis.get(key) # type: ignore
+        return await self._redis.get(key)
 
     async def set(self, key: str, value: str, expire: int | None = None):
         if expire:
-            await self.redis.set(key, value, ex=expire) # type: ignore
+            await self._redis.set(key, value, ex=expire)
         else:
-            await self.redis.set(key, value) # type: ignore
+            await self._redis.set(key, value)
 
     async def delete(self, key: str):
-        await self.redis.delete(key) # type: ignore
+        await self._redis.delete(key)

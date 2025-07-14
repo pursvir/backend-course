@@ -7,9 +7,10 @@ from src.repos.utils import room_ids_for_booking
 from src.schemas.hotels import Hotel
 from src.models.hotels import HotelsORM
 
+
 class HotelsRepository(BaseRepository):
-    model = HotelsORM # type: ignore
-    mapper = HotelDataMapper # type: ignore
+    model = HotelsORM
+    mapper = HotelDataMapper
 
     async def get_filtered_by_time(
         self,
@@ -28,9 +29,7 @@ class HotelsRepository(BaseRepository):
         )
 
         query = (
-            select(HotelsORM)
-            .select_from(HotelsORM)
-            .filter(HotelsORM.id.in_(hotel_ids))
+            select(HotelsORM).select_from(HotelsORM).filter(HotelsORM.id.in_(hotel_ids))
         )
         if title:
             query = query.filter(
@@ -42,4 +41,4 @@ class HotelsRepository(BaseRepository):
             )
         query = query.limit(limit).offset(offset)
         result = await self.session.execute(query)
-        return [ self.mapper.map_to_domain_entity(row) for row in result.scalars().all() ]
+        return [self.mapper.map_to_domain_entity(row) for row in result.scalars().all()]

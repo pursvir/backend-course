@@ -18,10 +18,11 @@ from src.api.facilities import router as facilities_router
 from src.api.images import router as images_router
 from src.init import redis_manager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_manager.connect()
-    FastAPICache.init(backend=RedisBackend(redis_manager.redis), prefix="fastapi-cache") # type: ignore
+    FastAPICache.init(backend=RedisBackend(redis_manager._redis), prefix="fastapi-cache")
     yield
     await redis_manager.close()
 
