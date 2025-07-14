@@ -1,8 +1,8 @@
 from datetime import date
-from fastapi import Query, Path, Body, APIRouter, Depends
+from fastapi import Query, Body, APIRouter
 from fastapi_cache.decorator import cache
 
-from src.schemas.hotels import Hotel, HotelAdd, HotelPatch
+from src.schemas.hotels import HotelAdd, HotelPatch
 from src.api.dependencies import DBDep, PaginationDep
 
 

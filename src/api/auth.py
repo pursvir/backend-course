@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Response
-from services.auth import AuthService
 from sqlalchemy.exc import IntegrityError
 
 from src.api.dependencies import DBDep, UserIDDep
@@ -18,9 +17,7 @@ async def register_user(db: DBDep, data: UserAddRequest):
         await db.users.add(new_user_data)
         await db.commit()
     except IntegrityError:
-        raise HTTPException(
-            status_code=401, detail="Пользователь с данным email уже существует!"
-        )
+        raise HTTPException(status_code=401, detail="Пользователь с данным email уже существует!")
     return {"status": "OK"}
 
 
@@ -30,9 +27,7 @@ async def login_user(db: DBDep, data: UserAddRequest, response: Response):
         email=data.email,
     )
     if not user:
-        raise HTTPException(
-            status_code=401, detail="Данного пользователя не существует!"
-        )
+        raise HTTPException(status_code=401, detail="Данного пользователя не существует!")
     if not AuthService().verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Пароль неверный!")
     access_token = AuthService().create_access_token({"user_id": user.id})

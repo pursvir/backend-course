@@ -1,4 +1,4 @@
-# ruff: noqa: E402
+# ruff: noqa: E402, F403
 import json
 from typing import AsyncGenerator
 from unittest import mock
@@ -13,7 +13,6 @@ from src.api.dependencies import get_db
 from src.db import Base, engine_np, async_session_maker_np
 from src.config import settings
 from src.models import *
-from src.repos.mappers.mappers import HotelDataMapper, RoomsDataMapper
 from src.schemas.hotels import HotelAdd
 from src.schemas.rooms import RoomAdd
 from src.utils.db_manager import DBManager
@@ -40,9 +39,7 @@ app.dependency_overrides[get_db] = get_db_np
 
 @pytest.fixture(scope="session")
 async def ac() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
 
@@ -61,9 +58,7 @@ async def fill_database(setup_database):
     ):
         hotels = json.load(hotels_file)
         rooms = json.load(rooms_file)
-    hotels_data = [
-        HotelAdd.model_validate(hotel, from_attributes=True) for hotel in hotels
-    ]
+    hotels_data = [HotelAdd.model_validate(hotel, from_attributes=True) for hotel in hotels]
     rooms_data = [RoomAdd.model_validate(room, from_attributes=True) for room in rooms]
 
     async with DBManager(async_session_maker_np) as db_:

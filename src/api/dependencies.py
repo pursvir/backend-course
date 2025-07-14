@@ -1,8 +1,6 @@
 from fastapi import Depends, Query, Request, HTTPException
 from pydantic import BaseModel
-from typing import Annotated, List
-
-from sqlalchemy.ext.asyncio.session import async_session
+from typing import Annotated
 
 from src.db import async_session_maker
 from src.services.auth import AuthService

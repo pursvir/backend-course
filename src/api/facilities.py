@@ -1,10 +1,8 @@
 from fastapi import APIRouter
 from fastapi_cache.decorator import cache
-import json
 
-from src.schemas.bookings import BookingAddRequest, BookingAdd
-from src.api.dependencies import DBDep, UserIDDep
-from src.schemas.facilities import Facility, FacilityAdd
+from src.api.dependencies import DBDep
+from src.schemas.facilities import FacilityAdd
 
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])

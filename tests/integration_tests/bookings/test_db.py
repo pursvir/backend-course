@@ -1,8 +1,6 @@
 from datetime import date
 
-from src.db import async_session_maker_np
 from src.schemas.bookings import BookingAdd
-from src.utils.db_manager import DBManager
 
 
 async def test_booking_crud(db):
@@ -37,9 +35,7 @@ async def test_booking_crud(db):
     await db.bookings.edit(updated_booking_data, id=added_booking.id)
     updated_booking = await db.bookings.get_one_or_none(id=added_booking.id)
     assert updated_booking
-    assert (
-        updated_booking.model_dump(exclude={"id"}) == updated_booking_data.model_dump()
-    )
+    assert updated_booking.model_dump(exclude={"id"}) == updated_booking_data.model_dump()
 
     await db.bookings.delete(id=added_booking.id)
     booking = await db.bookings.get_one_or_none(id=added_booking.id)

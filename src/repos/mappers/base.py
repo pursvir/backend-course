@@ -7,9 +7,10 @@ from src.db import Base
 
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
+
 class DataMapper:
     db_model: Type[Base]
-    schema: Type[SchemaType] # type: ignore
+    schema: Type[SchemaType]  # type: ignore
 
     def __init__(self) -> None:
         pass

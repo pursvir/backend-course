@@ -24,9 +24,7 @@ def resize_image(image_path: str):
         output_path = os.path.join(OUTPUT_FOLDER, new_filename)
         img_resized.save(output_path)
 
-    print(
-        f"Изображение сохранено в следующих размерах: {SIZES} в папке {OUTPUT_FOLDER}"
-    )
+    print(f"Изображение сохранено в следующих размерах: {SIZES} в папке {OUTPUT_FOLDER}")
 
 
 async def get_bookings_with_today_checkin_helper():

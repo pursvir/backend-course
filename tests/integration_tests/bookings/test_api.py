@@ -1,8 +1,6 @@
 import pytest
 from httpx import AsyncClient
 
-from tests.conftest import authenticated_ac
-
 room_booking_params = [
     (1, "2024-08-01", "2024-08-10", 200),
     (1, "2024-08-01", "2024-08-10", 200),
@@ -15,9 +13,7 @@ room_booking_params = [
 successful_room_bookings = 0
 
 
-@pytest.mark.parametrize(
-    "room_id, date_from, date_to, status_code", room_booking_params
-)
+@pytest.mark.parametrize("room_id, date_from, date_to, status_code", room_booking_params)
 async def test_add_bookings(
     room_id: int,
     date_from: str,

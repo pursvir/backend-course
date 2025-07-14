@@ -7,7 +7,7 @@ from src.models.bookings import BookingsORM
 from src.models.rooms import RoomsORM
 from src.repos.mappers.mappers import BookingDataMapper, RoomsDataMapper
 from src.repos.utils import room_ids_for_booking
-from src.schemas.bookings import Booking, BookingAdd, BookingAddRequest
+from src.schemas.bookings import BookingAdd
 
 
 class InsertionException(Exception):
@@ -21,9 +21,7 @@ class BookingsRepository(BaseRepository):
     async def get_bookings_with_today_checkin(self):
         query = select(BookingsORM).filter(BookingsORM.date_from == date.today())
         res = await self.session.execute(query)
-        return [
-            self.mapper.map_to_domain_entity(booking) for booking in res.scalars().all()
-        ]
+        return [self.mapper.map_to_domain_entity(booking) for booking in res.scalars().all()]
 
     async def add_booking(self, data: BookingAdd, hotel_id: int):
         room_ids = room_ids_for_booking(
@@ -38,9 +36,7 @@ class BookingsRepository(BaseRepository):
             .filter(RoomsORM.id.in_(room_ids))
         )
         result = await self.session.execute(rooms_availabe_query)
-        res = [
-            RoomsDataMapper.map_to_domain_entity(row) for row in result.scalars().all()
-        ]
+        res = [RoomsDataMapper.map_to_domain_entity(row) for row in result.scalars().all()]
         if res == []:
             raise HTTPException(status_code=400)
         await super().add(data)
