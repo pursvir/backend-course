@@ -7,7 +7,7 @@ from vars import auth_credentials
 @pytest.mark.parametrize(
     "email, password, register_status_code, login_status_code",
     [
-        (auth_credentials["email"], auth_credentials["password"], 401, None),
+        (auth_credentials["email"], auth_credentials["password"], 409, None),
         ("thisisdefinitelyaninvalidemailaddress", "1", 422, None),
         ("ivan-petrov@yandex.ru", "Qwerty123", 200, 200),
     ],

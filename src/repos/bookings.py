@@ -1,17 +1,13 @@
 from datetime import date
-from fastapi.exceptions import HTTPException
 from sqlalchemy import select
 
+from src.exceptions import AllRoomsAreBookedException
 from src.repos.base import BaseRepository
 from src.models.bookings import BookingsORM
 from src.models.rooms import RoomsORM
 from src.repos.mappers.mappers import BookingDataMapper, RoomsDataMapper
 from src.repos.utils import room_ids_for_booking
 from src.schemas.bookings import BookingAdd
-
-
-class InsertionException(Exception):
-    pass
 
 
 class BookingsRepository(BaseRepository):
@@ -38,5 +34,5 @@ class BookingsRepository(BaseRepository):
         result = await self.session.execute(rooms_availabe_query)
         res = [RoomsDataMapper.map_to_domain_entity(row) for row in result.scalars().all()]
         if res == []:
-            raise HTTPException(status_code=400)
+            raise AllRoomsAreBookedException
         await super().add(data)

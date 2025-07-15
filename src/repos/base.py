@@ -1,9 +1,11 @@
 from typing import Sequence, Any
 from pydantic import BaseModel
 from sqlalchemy import select, insert, update, delete
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import Base
+from src.exceptions import ObjectAddConflictException, ObjectNotFoundException
 from src.repos.mappers.base import DataMapper
 
 
@@ -34,13 +36,21 @@ class BaseRepository:
     async def get_one(self, **filter_by) -> BaseModel | None | Any:
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
-        row = result.scalars().one()
+        try:
+            row = result.scalars().one()
+        except NoResultFound:
+            raise ObjectNotFoundException
         return self.mapper.map_to_domain_entity(row)
 
     async def add(self, data: BaseModel) -> BaseModel | Any:
         add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        result = await self.session.execute(add_data_stmt)
-        row = result.scalars().one()
+        try:
+            result = await self.session.execute(add_data_stmt)
+            row = result.scalars().one()
+        except IntegrityError:
+            # Данный exception может вылетить либо когда объект существует, либо когда указываются неправильные связи
+            #   как дать программе различить данные случаи я пока не очень понимаю :(
+            raise ObjectAddConflictException
         return self.mapper.map_to_domain_entity(row)
 
     async def add_bulk(self, data: Sequence[BaseModel]) -> None:
@@ -53,7 +63,10 @@ class BaseRepository:
             .filter_by(**filter_by)
             .values(**data.model_dump(exclude_unset=partially_updated))
         )
-        await self.session.execute(update_stmt)
+        try:
+            await self.session.execute(update_stmt)
+        except NoResultFound:
+            raise ObjectNotFoundException
 
     async def delete(self, **filter_by) -> None:
         delete_stmt = delete(self.model).filter_by(**filter_by)
