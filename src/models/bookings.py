@@ -1,6 +1,7 @@
 from datetime import date
-from sqlalchemy.orm import Mapped, mapped_column
+
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.util.langhelpers import hybridproperty
 
 from src.db import Base

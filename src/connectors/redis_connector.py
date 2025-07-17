@@ -1,3 +1,5 @@
+import logging
+
 import redis.asyncio as redis
 
 
@@ -9,6 +11,7 @@ class RedisManager:
 
     async def connect(self):
         self._redis = await redis.from_url(self.url)
+        logging.info(f"Connected to Redis instance under URL={self.url}")
 
     async def close(self):
         if self._redis:

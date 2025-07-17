@@ -1,9 +1,10 @@
 from datetime import date
-from sqlalchemy import Select, select, func
+
+from sqlalchemy import Select, func, select
 from sqlalchemy.sql.expression import Subquery
 
-from src.models.rooms import RoomsORM
 from src.models.bookings import BookingsORM
+from src.models.rooms import RoomsORM
 
 
 def room_ids_for_booking(

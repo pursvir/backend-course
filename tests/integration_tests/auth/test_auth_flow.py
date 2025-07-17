@@ -1,6 +1,5 @@
 import pytest
 from httpx import AsyncClient
-
 from vars import auth_credentials
 
 

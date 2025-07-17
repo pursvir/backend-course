@@ -1,12 +1,22 @@
-from datetime import datetime, timezone, timedelta
-from fastapi.exceptions import HTTPException
+from datetime import datetime, timedelta, timezone
+
 import jwt
+from fastapi.exceptions import HTTPException
 from passlib.context import CryptContext
 
 from src.config import settings
+from src.exceptions import (
+    IncorrectPasswordException,
+    NonValidTokenException,
+    ObjectAlreadyExistsException,
+    ObjectNotFoundException,
+    UserAlreadyExistsException,
+)
+from src.schemas.users import UserAdd, UserAddRequest
+from src.services.base import BaseService
 
 
-class AuthService:
+class CryptoService:
     _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def create_access_token(self, data: dict) -> str:
@@ -20,14 +30,39 @@ class AuthService:
         )
         return encoded_jwt
 
-    def decode_token(self, token: str) -> dict:
+    @staticmethod
+    def decode_token(token: str) -> dict:
         try:
             return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         except jwt.exceptions.DecodeError:
-            raise HTTPException(status_code=401, detail="Невалидный токен")
+            raise NonValidTokenException
 
     def hash_password(self, password: str) -> str:
         return self._pwd_context.hash(password)
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return self._pwd_context.verify(plain_password, hashed_password)
+
+
+class AuthService(BaseService):
+    async def add_user(self, user_data: UserAddRequest) -> None:
+        password_hash = CryptoService().hash_password(user_data.password)
+        new_user_data = UserAdd(email=user_data.email, password_hash=password_hash)
+        try:
+            await self.db.users.add(new_user_data)
+        except ObjectAlreadyExistsException:
+            raise UserAlreadyExistsException
+        await self.db.commit()
+
+    async def get_access_token_for_user(self, data: UserAddRequest):
+        user = await self.db.users.get_user_with_hashed_password(
+            email=data.email,
+        )
+        if not user:
+            raise ObjectNotFoundException
+        if not CryptoService().verify_password(data.password, user.password_hash):
+            raise IncorrectPasswordException
+        return CryptoService().create_access_token({"user_id": user.id})
+
+    async def get_user(self, user_id: int):
+        return await self.db.users.get_one_or_none(id=user_id)

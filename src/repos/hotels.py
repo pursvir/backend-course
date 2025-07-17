@@ -1,10 +1,10 @@
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
+from src.models.hotels import HotelsORM
 from src.models.rooms import RoomsORM
 from src.repos.base import BaseRepository
 from src.repos.mappers.mappers import HotelDataMapper
 from src.repos.utils import room_ids_for_booking
-from src.models.hotels import HotelsORM
 
 
 class HotelsRepository(BaseRepository):

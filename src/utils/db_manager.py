@@ -1,10 +1,10 @@
 from sqlalchemy.ext.asyncio.session import async_sessionmaker
 
+from src.repos.bookings import BookingsRepository
 from src.repos.facilities import FacilitiesRepository, RoomsFacilitiesRepository
 from src.repos.hotels import HotelsRepository
 from src.repos.rooms import RoomsRepository
 from src.repos.users import UsersRepository
-from src.repos.bookings import BookingsRepository
 
 
 class DBManager:

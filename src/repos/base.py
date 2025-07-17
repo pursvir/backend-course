@@ -1,11 +1,14 @@
-from typing import Sequence, Any
+import logging
+from typing import Any, Sequence
+
+from asyncpg.exceptions import UniqueViolationError
 from pydantic import BaseModel
-from sqlalchemy import select, insert, update, delete
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import Base
-from src.exceptions import ObjectAddConflictException, ObjectNotFoundException
+from src.exceptions import ObjectAlreadyExistsException, ObjectNotFoundException
 from src.repos.mappers.base import DataMapper
 
 
@@ -47,10 +50,12 @@ class BaseRepository:
         try:
             result = await self.session.execute(add_data_stmt)
             row = result.scalars().one()
-        except IntegrityError:
-            # Данный exception может вылетить либо когда объект существует, либо когда указываются неправильные связи
-            #   как дать программе различить данные случаи я пока не очень понимаю :(
-            raise ObjectAddConflictException
+        except IntegrityError as ex:
+            if isinstance(ex.orig.__cause__, UniqueViolationError):  # type: ignore
+                raise ObjectAlreadyExistsException
+            else:
+                logging.exception(f"Unknown error, failed to add following data: {data}")
+                raise ex
         return self.mapper.map_to_domain_entity(row)
 
     async def add_bulk(self, data: Sequence[BaseModel]) -> None:
@@ -63,10 +68,7 @@ class BaseRepository:
             .filter_by(**filter_by)
             .values(**data.model_dump(exclude_unset=partially_updated))
         )
-        try:
-            await self.session.execute(update_stmt)
-        except NoResultFound:
-            raise ObjectNotFoundException
+        await self.session.execute(update_stmt)
 
     async def delete(self, **filter_by) -> None:
         delete_stmt = delete(self.model).filter_by(**filter_by)
