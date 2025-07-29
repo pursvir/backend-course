@@ -1,3 +1,4 @@
+import aboba
 from fastapi import APIRouter, Response
 
 from src.api.dependencies import DBDep, UserIDDep
@@ -19,9 +20,9 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и аутент
 async def register_user(db: DBDep, user_data: UserAddRequest):
     try:
         await AuthService(db).add_user(user_data)
-        return {"status": "OK"}
     except ObjectAlreadyExistsException:
         raise UserAlreadyExistsHTTPException
+    return {"status": "OK"}
 
 
 @router.post("/login")
