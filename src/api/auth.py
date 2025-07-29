@@ -1,4 +1,3 @@
-import aboba
 from fastapi import APIRouter, Response
 
 from src.api.dependencies import DBDep, UserIDDep
