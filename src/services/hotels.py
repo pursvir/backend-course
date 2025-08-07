@@ -31,8 +31,9 @@ class HotelsService(BaseService):
         return await self.db.hotels.get_one(id=hotel_id)
 
     async def add_hotel(self, hotel_data: HotelAdd):
-        await self.db.hotels.add(hotel_data)
+        new_hotel = await self.db.hotels.add(hotel_data)
         await self.db.commit()
+        return new_hotel
 
     async def edit_hotel(self, hotel_id: int, hotel_data: HotelAdd):
         await self.db.hotels.edit(hotel_data, id=hotel_id)

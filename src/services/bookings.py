@@ -26,3 +26,4 @@ class BookingsService(BaseService):
             hotel_id=hotel.id,  # pyright: ignore[reportOptionalMemberAccess]
         )
         await self.db.commit()
+        return new_booking_data
