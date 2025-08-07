@@ -5,8 +5,8 @@ services:
       context: .
     env_file:
       - .env
-    ports:
-      - "7777:8000"
+    # ports:
+    #   - "7777:8000"
     networks:
       - myNetwork
 

@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi.exceptions import HTTPException
 from passlib.context import CryptContext
 
 from src.config import settings
@@ -34,7 +33,7 @@ class CryptoService:
     def decode_token(token: str) -> dict:
         try:
             return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        except jwt.exceptions.DecodeError:
+        except (jwt.exceptions.DecodeError, jwt.exceptions.ExpiredSignatureError):
             raise NonValidTokenException
 
     def hash_password(self, password: str) -> str:
