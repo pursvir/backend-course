@@ -34,6 +34,6 @@ async def add_booking(db: DBDep, user_id: UserIDDep, booking_data: BookingAddReq
         new_booking_data = await BookingsService(db).add_booking(user_id, booking_data)
     except RoomNotFoundException:
         raise RoomNotFoundHTTPException
-    except AllRoomsAreBookedException as ex:
+    except AllRoomsAreBookedException:
         raise AllRoomsAreBookedHTTPException
     return {"status": "OK", "data": new_booking_data}
