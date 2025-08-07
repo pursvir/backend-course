@@ -1,14 +1,18 @@
 import logging
 from typing import Any, Sequence
 
-from asyncpg.exceptions import UniqueViolationError
+from asyncpg.exceptions import NotNullViolationError, UniqueViolationError
 from pydantic import BaseModel
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import Base
-from src.exceptions import ObjectAlreadyExistsException, ObjectNotFoundException
+from src.exceptions import (
+    IncorrectObjectRelationsException,
+    ObjectAlreadyExistsException,
+    ObjectNotFoundException,
+)
 from src.repos.mappers.base import DataMapper
 
 
@@ -52,7 +56,10 @@ class BaseRepository:
             row = result.scalars().one()
         except IntegrityError as ex:
             if isinstance(ex.orig.__cause__, UniqueViolationError):  # type: ignore
-                raise ObjectAlreadyExistsException
+                raise ObjectAlreadyExistsException from ex
+            elif isinstance(ex.orig.__cause__, NotNullViolationError):  # type: ignore
+                # e.g. non-existing facility ids in room add request
+                raise IncorrectObjectRelationsException from ex
             else:
                 logging.exception(f"Unknown error, failed to add following data: {data}")
                 raise ex

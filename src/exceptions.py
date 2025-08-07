@@ -89,12 +89,28 @@ class IncorrectDateRangeHTTPException(NabronirovalHTTPException):
     status_code = 422
     detail = "Дата заезда не может быть позже даты выезда"
 
+
 class FacilityAlreadyExistsException(NabronirovalException):
     detail = "Такое удобство уже существует"
+
 
 class FacilityAlreadyExistsHTTPException(NabronirovalHTTPException):
     status_code = 409
     detail = "Такое удобство уже существует"
+
+
+class FacilitiesNotFoundException(NabronirovalException):
+    detail = "Таких удобств не существует"
+
+
+class FacilitiesNotFoundHTTPException(NabronirovalHTTPException):
+    status_code = 404
+    detail = "Таких удобств не существует"
+
+
+class IncorrectObjectRelationsException(NabronirovalException):
+    detail = "Невозможно добавить объект с такими связями"
+
 
 def check_date_to_after_date_from(date_from: date, date_to: date) -> None:
     if date_to < date_from:
