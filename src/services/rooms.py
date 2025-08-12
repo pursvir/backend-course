@@ -18,6 +18,7 @@ from src.services.utils import get_hotel_with_check, get_room_with_check
 class RoomsService(BaseService):
     async def get_rooms_filtered_by_time(self, hotel_id: int, date_from: date, date_to: date):
         check_date_to_after_date_from(date_from, date_to)
+        await get_hotel_with_check(self.db, hotel_id)
         return await self.db.rooms.get_filtered_by_time(
             hotel_id=hotel_id,
             date_from=date_from,

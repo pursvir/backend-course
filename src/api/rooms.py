@@ -13,7 +13,7 @@ from src.exceptions import (
     RoomNotFoundException,
     RoomNotFoundHTTPException,
 )
-from src.schemas.fields import pk
+from src.schemas.fields import pos_int
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomPatchRequest, RoomRequestAdd
 from src.services.rooms import RoomsService
 from src.services.utils import get_hotel_with_check
@@ -54,7 +54,7 @@ async def get_room(db: DBDep, hotel_id: int, room_id: int):
     summary="Новый номер",
     description="Добавить новый номер в отель",
 )
-async def add_room(db: DBDep, hotel_id: pk, room_data: RoomRequestAdd):
+async def add_room(db: DBDep, hotel_id: pos_int, room_data: RoomRequestAdd):
     try:
         new_room_data = await RoomsService(db).add_room(hotel_id, room_data)
     except HotelNotFoundException:
@@ -69,7 +69,7 @@ async def add_room(db: DBDep, hotel_id: pk, room_data: RoomRequestAdd):
     summary="Изменить номер",
     description="Полная смена информации о номере",
 )
-async def edit_room(db: DBDep, hotel_id: pk, room_id: pk, room_data: RoomRequestAdd):
+async def edit_room(db: DBDep, hotel_id: pos_int, room_id: pos_int, room_data: RoomRequestAdd):
     try:
         await RoomsService(db).edit_room(hotel_id, room_id, room_data)
     except HotelNotFoundException:
@@ -84,7 +84,9 @@ async def edit_room(db: DBDep, hotel_id: pk, room_id: pk, room_data: RoomRequest
     summary="Частично изменить номер",
     description="Частичная смена информации о номере",
 )
-async def partially_edit_room(db: DBDep, hotel_id: pk, room_id: pk, room_data: RoomPatchRequest):
+async def partially_edit_room(
+    db: DBDep, hotel_id: pos_int, room_id: pos_int, room_data: RoomPatchRequest
+):
     try:
         await RoomsService(db).edit_room_partially(hotel_id, room_id, room_data)
     except HotelNotFoundException:
@@ -99,7 +101,7 @@ async def partially_edit_room(db: DBDep, hotel_id: pk, room_id: pk, room_data: R
     summary="Удалить номер",
     description="Удаление информации о номере",
 )
-async def delete_room(db: DBDep, hotel_id: pk, room_id: pk):
+async def delete_room(db: DBDep, hotel_id: pos_int, room_id: pos_int):
     try:
         await RoomsService(db).delete_room(room_id, hotel_id)
     except HotelNotFoundException:

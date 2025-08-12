@@ -1,14 +1,14 @@
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from src.schemas.facilities import Facility
-from src.schemas.fields import str_not_null
+from src.schemas.fields import pos_int, str_not_null
 
 
 class RoomBase(BaseModel):
     title: str_not_null
     description: str | None
-    price: int
-    quantity: int
+    price: pos_int
+    quantity: pos_int
 
 
 class RoomRequestAdd(RoomBase):
