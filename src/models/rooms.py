@@ -14,7 +14,7 @@ class RoomsORM(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     hotel_id: Mapped[int] = mapped_column(ForeignKey("hotels.id"))
-    title: Mapped[str]
+    title: Mapped[str] = mapped_column(unique=True)
     description: Mapped[str | None]
     price: Mapped[int]
     quantity: Mapped[int]
@@ -23,3 +23,5 @@ class RoomsORM(Base):
         back_populates="rooms",
         secondary="rooms_facilities",
     )
+
+    bookings = relationship("BookingsORM", cascade="all, delete-orphan")

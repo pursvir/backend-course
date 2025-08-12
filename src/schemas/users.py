@@ -1,9 +1,11 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 
+from src.schemas.fields import str_not_null
+
 
 class UserAddRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: str_not_null
 
 
 class UserAdd(BaseModel):

@@ -1,9 +1,11 @@
 from pydantic import BaseModel, ConfigDict
 
+from src.schemas.fields import str_not_null
+
 
 class HotelAdd(BaseModel):
-    title: str
-    location: str
+    title: str_not_null
+    location: str_not_null
 
 
 class Hotel(HotelAdd):

@@ -12,6 +12,9 @@ class FacilitiesRepository(BaseRepository):
     mapper = FacilitiesDataMapper
 
 
+# TODO: catch error of non-existing facility IDs
+
+
 class RoomsFacilitiesRepository(BaseRepository):
     model = RoomsFacilitiesORM
     mapper = RoomsFacilityDataMapper

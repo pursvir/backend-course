@@ -2,7 +2,9 @@ from datetime import date
 from re import L
 
 from src.exceptions import (
+    FacilitiesNotFoundException,
     HotelNotFoundException,
+    IncorrectObjectRelationsException,
     ObjectNotFoundException,
     RoomNotFoundException,
     check_date_to_after_date_from,
@@ -23,7 +25,11 @@ class RoomsService(BaseService):
         )
 
     async def get_room(self, room_id: int, hotel_id: int):
-        return await self.db.rooms.get_one(id=room_id, hotel_id=hotel_id)
+        await get_hotel_with_check(self.db, hotel_id)
+        try:
+            return await self.db.rooms.get_one(id=room_id, hotel_id=hotel_id)
+        except ObjectNotFoundException:
+            raise RoomNotFoundException
 
     async def add_room(self, hotel_id: int, room_data: RoomRequestAdd):
         await get_hotel_with_check(self.db, hotel_id)
@@ -39,8 +45,13 @@ class RoomsService(BaseService):
             )
             for facility_id in room_data.facilities_ids
         ]
-        await self.db.rooms_facilities.add_bulk(room_facilities_data)
+        if room_facilities_data:
+            try:
+                await self.db.rooms_facilities.add_bulk(room_facilities_data)
+            except IncorrectObjectRelationsException:
+                raise FacilitiesNotFoundException
         await self.db.commit()
+        return room
 
     async def edit_room(self, hotel_id: int, room_id: int, room_data: RoomRequestAdd):
         room_data_ = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
@@ -51,6 +62,8 @@ class RoomsService(BaseService):
         await self.db.commit()
 
     async def edit_room_partially(self, hotel_id, room_id, room_data: RoomPatchRequest):
+        if not (room_data.title or room_data.description or room_data.price or room_data.quantity):
+            return
         room_data_ = RoomPatch(
             hotel_id=hotel_id,
             **room_data.model_dump(

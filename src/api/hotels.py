@@ -5,7 +5,14 @@ from fastapi.exceptions import HTTPException
 from fastapi_cache.decorator import cache
 
 from src.api.dependencies import DBDep, PaginationDep
-from src.exceptions import HotelNotFoundHTTPException, ObjectNotFoundException
+from src.exceptions import (
+    HotelAlreadyExistsException,
+    HotelAlreadyExistsHTTPException,
+    HotelNotFoundException,
+    HotelNotFoundHTTPException,
+    ObjectNotFoundException,
+)
+from src.schemas.fields import pk
 from src.schemas.hotels import HotelAdd, HotelPatch
 from src.services.hotels import HotelsService
 
@@ -38,7 +45,7 @@ async def get_hotels(
     summary="Получить отель",
     description="<h3>Тут мы можем получить отель по ID-шнику из базы.</h3>",
 )
-async def get_hotel(db: DBDep, hotel_id: int):
+async def get_hotel(db: DBDep, hotel_id: pk):
     try:
         return await HotelsService(db).get_hotel(hotel_id=hotel_id)
     except ObjectNotFoundException:
@@ -71,7 +78,10 @@ async def create_hotel(
         }
     ),
 ):
-    new_hotel = await HotelsService(db).add_hotel(hotel_data)
+    try:
+        new_hotel = await HotelsService(db).add_hotel(hotel_data)
+    except HotelAlreadyExistsException:
+        raise HotelAlreadyExistsHTTPException
     return {"status": "OK", "data": new_hotel}
 
 
@@ -82,13 +92,13 @@ async def create_hotel(
 )
 async def put_hotel(
     db: DBDep,
-    hotel_id: int,
+    hotel_id: pk,
     hotel_data: HotelAdd,
 ):
     try:
         await HotelsService(db).edit_hotel(hotel_id, hotel_data)
         return {"status": "OK"}
-    except ObjectNotFoundException:
+    except HotelNotFoundException:
         raise HotelNotFoundHTTPException
 
 
@@ -97,11 +107,11 @@ async def put_hotel(
     summary="Частичное обновление данных об отеле",
     description="<h3>Тут мы частично обновляем данные об отеле: можно отправить name, а можно title, а можно вообще ничего</h3>",
 )
-async def patch_hotel(db: DBDep, hotel_id: int, hotel_data: HotelPatch):
+async def patch_hotel(db: DBDep, hotel_id: pk, hotel_data: HotelPatch):
     try:
         await HotelsService(db).edit_hotel_partially(hotel_id, hotel_data)
         return {"status": "OK"}
-    except ObjectNotFoundException:
+    except HotelNotFoundException:
         raise HotelNotFoundHTTPException
 
 
@@ -110,9 +120,9 @@ async def patch_hotel(db: DBDep, hotel_id: int, hotel_data: HotelPatch):
     summary="Удаление отеля по ID",
     description="<h3>Отель, ID которого будет указан в path, будет удалён из базы</h3>",
 )
-async def delete_hotel(db: DBDep, hotel_id: int):
+async def delete_hotel(db: DBDep, hotel_id: pk):
     try:
         await HotelsService(db).delete_hotel(hotel_id)
         return {"status": "OK"}
-    except ObjectNotFoundException:
+    except HotelNotFoundException:
         raise HotelNotFoundHTTPException

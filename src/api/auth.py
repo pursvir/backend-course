@@ -7,6 +7,7 @@ from src.exceptions import (
     ObjectAlreadyExistsException,
     ObjectNotFoundException,
     UserAlreadyExistsHTTPException,
+    UserNotFoundException,
     UserNotFoundHTTPException,
 )
 from src.schemas.users import UserAddRequest
@@ -28,7 +29,7 @@ async def register_user(db: DBDep, user_data: UserAddRequest):
 async def login_user(db: DBDep, user_data: UserAddRequest, response: Response):
     try:
         token = await AuthService(db).get_access_token_for_user(user_data)
-    except ObjectNotFoundException:
+    except UserNotFoundException:
         raise UserNotFoundHTTPException
     except IncorrectPasswordException:
         raise IncorrectPasswordHTTPException

@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Sequence
 
-from asyncpg.exceptions import NotNullViolationError, UniqueViolationError
+from asyncpg.exceptions import ForeignKeyViolationError, NotNullViolationError, UniqueViolationError
 from pydantic import BaseModel
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -58,7 +58,6 @@ class BaseRepository:
             if isinstance(ex.orig.__cause__, UniqueViolationError):  # type: ignore
                 raise ObjectAlreadyExistsException from ex
             elif isinstance(ex.orig.__cause__, NotNullViolationError):  # type: ignore
-                # e.g. non-existing facility ids in room add request
                 raise IncorrectObjectRelationsException from ex
             else:
                 logging.exception(f"Unknown error, failed to add following data: {data}")
@@ -67,7 +66,14 @@ class BaseRepository:
 
     async def add_bulk(self, data: Sequence[BaseModel]) -> None:
         add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
-        await self.session.execute(add_data_stmt)
+        try:
+            await self.session.execute(add_data_stmt)
+        except IntegrityError as ex:
+            if isinstance(ex.orig.__cause__, ForeignKeyViolationError):  # type: ignore
+                raise IncorrectObjectRelationsException from ex
+            else:
+                logging.exception(f"Unknown error, failed to add following data bulk: {data}")
+                raise ex
 
     async def edit(self, data: BaseModel, partially_updated: bool = False, **filter_by) -> None:
         update_stmt = (

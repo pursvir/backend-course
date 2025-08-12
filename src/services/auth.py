@@ -10,6 +10,7 @@ from src.exceptions import (
     ObjectAlreadyExistsException,
     ObjectNotFoundException,
     UserAlreadyExistsException,
+    UserNotFoundException,
 )
 from src.schemas.users import UserAdd, UserAddRequest
 from src.services.base import BaseService
@@ -58,7 +59,7 @@ class AuthService(BaseService):
             email=data.email,
         )
         if not user:
-            raise ObjectNotFoundException
+            raise UserNotFoundException
         if not CryptoService().verify_password(data.password, user.password_hash):
             raise IncorrectPasswordException
         return CryptoService().create_access_token({"user_id": user.id})

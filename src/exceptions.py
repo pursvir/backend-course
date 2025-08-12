@@ -35,6 +35,10 @@ class UserAlreadyExistsHTTPException(NabronirovalHTTPException):
     detail = "Пользователь с данным email уже существует!"
 
 
+class UserNotFoundException(NabronirovalException):
+    detail = "Данного пользователя не существует"
+
+
 class UserNotFoundHTTPException(NabronirovalHTTPException):
     status_code = 404
     detail = "Данного пользователя не существует"
@@ -56,6 +60,15 @@ class IncorrectPasswordException(NabronirovalException):
 class IncorrectPasswordHTTPException(NabronirovalHTTPException):
     status_code = 401
     detail = "Пароль неверный"
+
+
+class HotelAlreadyExistsException(NabronirovalException):
+    detail = "Отель с такими данными уже существует"
+
+
+class HotelAlreadyExistsHTTPException(NabronirovalHTTPException):
+    status_code = 409
+    detail = "Отель с такими данными уже существует"
 
 
 class HotelNotFoundException(ObjectNotFoundException):
