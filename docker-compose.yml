@@ -9,6 +9,9 @@ services:
     #   - "7777:8000"
     networks:
       - myNetwork
+    # depends_on:
+    #   booking_db:
+    #     condition: service_healthy
 
   booking_celery_worker_service:
     container_name: "booking_celery_worker"
@@ -29,6 +32,21 @@ services:
     networks:
       - myNetwork
     command: "celery --app=src.tasks.celery_app:celery_instance beat -l INFO"
+
+  # booking_db:
+  #   container_name: "booking_db"
+  #   image: postgres:16
+  #   environment:
+  #     POSTGRES_USER: username
+  #     POSTGRES_PASSWORD: 12345678
+  #     POSTGRES_DB: booking
+  #   networks:
+  #     - myNetwork
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U username -d booking"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
 
 networks:
   myNetwork:

@@ -1,6 +1,6 @@
 from datetime import date
 
-from src.api.dependencies import DBDep, PaginationDep
+from src.api.dependencies import PaginationDep
 from src.exceptions import (
     HotelAlreadyExistsException,
     ObjectAlreadyExistsException,
